@@ -1,27 +1,26 @@
 from fastapi import FastAPI, UploadFile, File
-from app.extractor import extraer_texto_pdf
+from app.extractor import extract_data_from_pdf
 
 app = FastAPI(
     title="Data Sniper API",
-    description="Extrae datos estructurados de PDFs aburridos.",
+    description="Intelligent API to extract structured data from unstructured PDFs.",
     version="1.0.0"
 )
 
 @app.get("/")
-def read_root():
-    return {"mensaje": "El Data Sniper está cargado y listo 🎯"}
+def health_check():
+    """Endpoint to check if the API is running."""
+    return {"status": "ok", "message": "Data Sniper API is ready to fire 🎯"}
 
-@app.post("/api/v1/extraer-factura")
-async def extraer_datos(file: UploadFile = File(...)):
-    # 1. Leemos el archivo en memoria
-    contenido = await file.read()
+@app.post("/api/v1/extract")
+async def extract_invoice_data(file: UploadFile = File(...)):
+    """Receives a PDF file and returns extracted structured data."""
+    content = await file.read()
     
-    # 2. Se lo pasamos a nuestro extractor inteligente (que ahora devuelve un diccionario)
-    datos_extraidos = extraer_texto_pdf(contenido)
+    extracted_data = extract_data_from_pdf(content)
     
-    # 3. Devolvemos la respuesta limpia
     return {
         "status": "success",
         "filename": file.filename,
-        "datos": datos_extraidos
+        "data": extracted_data
     }
