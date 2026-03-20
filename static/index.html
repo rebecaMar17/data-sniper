@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Sniper | AI Document Extractor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="bg-white shadow-xl rounded-2xl p-8 max-w-lg w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Data Sniper 🎯</h1>
+            <p class="text-gray-500">Sube un PDF y deja que la IA extraiga los datos.</p>
+        </div>
+
+        <form id="upload-form" class="space-y-6">
+            <div class="flex items-center justify-center w-full">
+                <label for="pdf-file" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Haz clic para subir</span> o arrastra tu PDF</p>
+                        <p id="file-name" class="text-xs text-blue-500 font-bold mt-2"></p>
+                    </div>
+                    <input id="pdf-file" type="file" accept=".pdf" class="hidden" required />
+                </label>
+            </div>
+            <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center transition">
+                Extraer Datos
+            </button>
+        </form>
+
+        <div id="loading" class="hidden mt-6 text-center">
+            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status"></div>
+            <p class="text-gray-500 mt-2 text-sm">La IA está leyendo el documento...</p>
+        </div>
+
+        <div id="result-container" class="hidden mt-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos Estructurados:</h3>
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
+                <pre id="json-result" class="text-green-400 text-sm font-mono"></pre>
+            </div>
+            <button id="download-btn" class="w-full text-blue-600 bg-blue-100 hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center transition">
+                📥 Descargar como Excel (.csv)
+            </button>
+        </div>
+    </div>
+</body>
+</html>

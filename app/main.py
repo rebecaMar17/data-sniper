@@ -1,4 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles # NUEVO: Para servir CSS y JS
 from app.extractor import extract_data_from_pdf
 
 app = FastAPI(
@@ -7,10 +9,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.get("/")
-def health_check():
-    """Endpoint to check if the API is running."""
-    return {"status": "ok", "message": "Data Sniper API is ready to fire 🎯"}
+def serve_frontend():
+    """Serves the main web interface."""
+    return FileResponse("static/index.html")
 
 @app.post("/api/v1/extract")
 async def extract_invoice_data(file: UploadFile = File(...)):
