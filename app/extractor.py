@@ -8,44 +8,39 @@ from dotenv import load_dotenv
 load_dotenv()
 client = genai.Client()
 
-EXTRACTION_PROMPT_TEMPLATE = """
-You are an expert data extractor.
-I will provide you with the text extracted from a document.
-Your mission is to extract the following information:
-- Customer or patient name (name)
-- Phone number (phone)
-- Document date (date)
-- Document issuer or company (issuer)
-
-Return ONLY a valid JSON with the keys: "name", "phone", "date", "issuer".
-If a value is not found, set it to null. Do not include markdown (like ```json) or additional text.
-
-Document text:
-{text}
-"""
-
-def extract_data_from_pdf(pdf_content: bytes) -> dict:
+def extract_data_from_pdf(pdf_content: bytes, fields: list) -> dict:
     """
-    Extracts raw text from a PDF file in memory and uses an LLM to return structured data
+    Extrae texto y pide a la IA que busque SOLO los campos solicitados por el usuario.
     """
-    full_text = "" # ¡Esta es la variable que faltaba inicializar!
-    
+    full_text = ""
     with pdfplumber.open(io.BytesIO(pdf_content)) as pdf:
         for page in pdf.pages:
             page_text = page.extract_text()
             if page_text:
                 full_text += page_text + "\n"
-                
-    prompt = EXTRACTION_PROMPT_TEMPLATE.format(text=full_text)
+
+    # Convertimos la lista de campos en un string para el prompt
+    fields_str = "\n".join([f"- {f}" for f in fields])
+    keys_str = ", ".join([f'"{f}"' for f in fields])
+
+    dynamic_prompt = f"""
+    You are a professional data extractor.
+    Extract the following information from the text:
+    {fields_str}
+
+    Return ONLY a valid JSON with these exact keys: {keys_str}.
+    If a value is not found, set it to null.
+    
+    Text:
+    {full_text}
+    """
     
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
+            model='gemini-2.0-flash', # Actualizado a la última versión
+            contents=dynamic_prompt,
         )
         clean_text = response.text.replace('```json', '').replace('```', '').strip()
-        structured_data = json.loads(clean_text)
-        return structured_data
-        
+        return json.loads(clean_text)
     except Exception as e:
-        return {"error": "AI processing failed", "details": str(e)}
+        return {"error": str(e)}

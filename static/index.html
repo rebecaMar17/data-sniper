@@ -1,50 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Sniper | AI Document Extractor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="/static/script.js" defer></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
+<body class="bg-gradient-to-br from-slate-50 to-indigo-50 min-h-screen flex items-center justify-center p-4 md:p-8 text-slate-800">
 
-    <div class="bg-white shadow-xl rounded-2xl p-8 max-w-lg w-full">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Data Sniper 🎯</h1>
-            <p class="text-gray-500">Sube un PDF y deja que la IA extraiga los datos.</p>
-        </div>
-
-        <form id="upload-form" class="space-y-6">
-            <div class="flex items-center justify-center w-full">
-                <label for="pdf-file" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
-                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Haz clic para subir</span> o arrastra tu PDF</p>
-                        <p id="file-name" class="text-xs text-blue-500 font-bold mt-2"></p>
+    <div class="max-w-5xl w-full bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl overflow-hidden border border-white">
+        
+        <div class="grid md:grid-cols-2">
+            
+            <div class="p-8 md:p-12 bg-white">
+                <div class="mb-8">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white mb-4 shadow-lg shadow-indigo-200">
+                        <i class="ph ph-target text-2xl"></i>
                     </div>
-                    <input id="pdf-file" type="file" accept=".pdf" class="hidden" required />
-                </label>
-            </div>
-            <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center transition">
-                Extraer Datos
-            </button>
-        </form>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">Data Sniper</h1>
+                    <p class="text-slate-500">Inteligencia Artificial para extraer datos estructurados de PDFs complejos.</p>
+                </div>
 
-        <div id="loading" class="hidden mt-6 text-center">
-            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status"></div>
-            <p class="text-gray-500 mt-2 text-sm">La IA está leyendo el documento...</p>
-        </div>
+                <form id="upload-form" class="space-y-6">
+                    <div id="drop-zone" class="relative group cursor-pointer">
+                        <input id="pdf-file" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required />
+                        <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center transition-all duration-300 group-hover:border-indigo-500 group-hover:bg-indigo-50 bg-slate-50">
+                            <i class="ph ph-file-pdf text-4xl text-slate-400 group-hover:text-indigo-500 mb-3 inline-block transition-colors"></i>
+                            <p class="text-sm font-medium text-slate-700 mb-1">Arrastra tu PDF aquí</p>
+                            <p class="text-xs text-slate-500 mb-4">o haz clic para explorar</p>
+                            <span id="file-name" class="inline-block px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-semibold text-indigo-600 shadow-sm truncate max-w-full hidden"></span>
+                        </div>
+                    </div>
 
-        <div id="result-container" class="hidden mt-8">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos Estructurados:</h3>
-            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
-                <pre id="json-result" class="text-green-400 text-sm font-mono"></pre>
+                    <button type="submit" id="submit-btn" class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-4 focus:ring-indigo-100 font-semibold rounded-xl text-sm px-5 py-3.5 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="ph ph-magic-wand text-lg"></i>
+                        Extraer Datos Mágicamente
+                    </button>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">¿Qué quieres extraer? (separado por comas)</label>
+                        <input id="custom-fields" type="text" 
+                        value="name, phone, date, issuer, total" 
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition-all" />
+                    </div>
+                </form>
             </div>
-            <button id="download-btn" class="w-full text-blue-600 bg-blue-100 hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center transition">
-                📥 Descargar como Excel (.csv)
-            </button>
+
+            <div class="p-8 md:p-12 bg-slate-50/50 flex flex-col justify-center border-l border-slate-100 relative">
+                
+                <div id="initial-state" class="text-center text-slate-400">
+                    <i class="ph ph-scan text-6xl mb-4 opacity-50"></i>
+                    <p class="font-medium">Esperando documento...</p>
+                </div>
+
+                <div id="loading" class="hidden flex-col items-center justify-center text-center">
+                    <div class="loader mb-4"></div>
+                    <p class="font-semibold text-indigo-600">Procesando documento</p>
+                    <p class="text-sm text-slate-500 mt-1">Nuestra IA está leyendo el PDF, dame un segundo...</p>
+                </div>
+
+                <div id="result-container" class="hidden w-full h-full flex flex-col">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Datos Extraídos</h3>
+                    
+                    <div class="space-y-3 mb-8 flex-grow" id="data-cards">
+                        </div>
+
+                    <button id="download-btn" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 text-slate-700 font-bold rounded-xl text-sm px-5 py-3.5 transition-all">
+                        <i class="ph ph-download-simple text-lg"></i>
+                        Descargar Excel (.csv)
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
