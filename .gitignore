@@ -1,0 +1,13 @@
+#Entorno virtual
+venv/
+env/
+
+#Archivos cacheados de Python
+__pycache__/
+*.pyc
+
+#Variables de entorno
+.env
+
+#Archivos de prueba
+sample_pdfs/
