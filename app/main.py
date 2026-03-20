@@ -3,20 +3,25 @@ from app.extractor import extraer_texto_pdf
 
 app = FastAPI(
     title="Data Sniper API",
-    description="Extrae datos estructurados de PDFs",
-    version="1.0.0",
+    description="Extrae datos estructurados de PDFs aburridos.",
+    version="1.0.0"
 )
 
 @app.get("/")
 def read_root():
-    return {"mensaje": "El data sniper esta cargado y listo"}
+    return {"mensaje": "El Data Sniper está cargado y listo 🎯"}
 
 @app.post("/api/v1/extraer-factura")
 async def extraer_datos(file: UploadFile = File(...)):
+    # 1. Leemos el archivo en memoria
     contenido = await file.read()
-    texto_extraido = extraer_texto_pdf(contenido)
+    
+    # 2. Se lo pasamos a nuestro extractor inteligente (que ahora devuelve un diccionario)
+    datos_extraidos = extraer_texto_pdf(contenido)
+    
+    # 3. Devolvemos la respuesta limpia
     return {
         "status": "success",
         "filename": file.filename,
-        "texto_crudo": texto_extraido[:500] + "..."
+        "datos": datos_extraidos
     }
